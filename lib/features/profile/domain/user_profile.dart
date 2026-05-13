@@ -19,7 +19,7 @@ class UserProfile {
       id: id,
       displayName: data['displayName'] as String? ?? 'Learner',
       avatarEmoji: data['avatarEmoji'] as String? ?? '🐉',
-      dialect: data['dialect'] as String? ?? 'Gogledd',
+      dialect: data['dialect'] as String? ?? 'North Wales',
       dailyGoal: (data['dailyGoal'] as num?)?.toInt() ?? 20,
     );
   }

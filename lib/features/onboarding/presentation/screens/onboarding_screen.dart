@@ -92,7 +92,7 @@ class OnboardingScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Three gestures. Twenty seconds. One paned.',
+                    'Three gestures. Twenty seconds. One round.',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       color: AppColors.mutedFg,
@@ -257,7 +257,7 @@ class _FrontCard extends StatelessWidget {
                 const Text('👋', style: TextStyle(fontSize: 48)),
                 const SizedBox(height: 12),
                 Text(
-                  'Helo',
+                  'Hello',
                   style: GoogleFonts.dmSerifDisplay(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
@@ -266,7 +266,7 @@ class _FrontCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Hello',
+                  'Welsh: Helo',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     color: AppColors.mutedFg,

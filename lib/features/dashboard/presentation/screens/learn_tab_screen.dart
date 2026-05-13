@@ -267,7 +267,7 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
 
                 const SizedBox(height: 6),
                 Text(
-                  'Up next: ${next.welsh}',
+                  'Up next: ${next.english}',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     color: AppColors.mutedFg,
@@ -353,7 +353,7 @@ class _AllDone extends ConsumerWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Da iawn!',
+                          'Well done!',
                           style: GoogleFonts.dmSerifDisplay(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
@@ -487,7 +487,7 @@ class _FlashCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Do you know the Welsh?',
+                          'Do you know the Welsh word?',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             color: AppColors.mutedFg,
@@ -495,7 +495,7 @@ class _FlashCard extends StatelessWidget {
                         ),
                       ] else ...[
                         Text(
-                          'CYMRAEG',
+                          'WELSH',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,

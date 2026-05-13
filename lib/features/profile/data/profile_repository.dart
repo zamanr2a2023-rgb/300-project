@@ -10,7 +10,7 @@ class ProfileRepository {
         id: uid,
         displayName: 'Learner',
         avatarEmoji: '🐉',
-        dialect: 'Gogledd',
+        dialect: 'North Wales',
         dailyGoal: 20,
       ),
     );

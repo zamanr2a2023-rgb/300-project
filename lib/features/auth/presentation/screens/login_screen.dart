@@ -92,8 +92,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   // Headline
                   Text(
                     _mode == _AuthMode.login
-                        ? 'Croeso nôl!\nTime for a paned.'
-                        : 'Croeso!\nLet\'s brew a habit.',
+                        ? 'Welcome back!\nTime for a cuppa.'
+                        : 'Welcome!\nLet\'s build a habit.',
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
@@ -119,7 +119,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 6),
                     _PanedTextField(
                       controller: _name,
-                      hint: 'Eleri',
+                      hint: 'Alex',
                       autofillHints: const [AutofillHints.name],
                       validator: (v) =>
                           (v == null || v.trim().length < 2) ? 'At least 2 characters' : null,
@@ -131,7 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 6),
                   _PanedTextField(
                     controller: _email,
-                    hint: 'dafydd@paned.cymru',
+                    hint: 'you@example.com',
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.email],
                     validator: (v) =>

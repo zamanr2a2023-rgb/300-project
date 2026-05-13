@@ -126,7 +126,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Dysgu Cymraeg · Sip by sip',
+                    'Learn Welsh · Sip by sip',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,

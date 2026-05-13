@@ -68,7 +68,7 @@ class ProgressTabScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Da iawn, $firstName.',
+                          'Well done, $firstName.',
                           style: GoogleFonts.dmSerifDisplay(
                             fontSize: 30,
                             fontWeight: FontWeight.w900,
@@ -257,11 +257,11 @@ class ProgressTabScreen extends ConsumerWidget {
                     mainAxisSpacing: AppSpacing.sm,
                     crossAxisSpacing: AppSpacing.sm,
                     children: [
-                      _Badge(emoji: '🐉', label: 'First Draig', earned: summary.learned >= 1),
+                      _Badge(emoji: '🐉', label: 'First dragon', earned: summary.learned >= 1),
                       _Badge(emoji: '🔥', label: '7-day Sip', earned: streak >= 7),
                       _Badge(emoji: '📚', label: '50 words', earned: summary.learned >= 50),
-                      _Badge(emoji: '⛰️', label: 'Mynydd', earned: summary.learned >= 10),
-                      _Badge(emoji: '🌊', label: 'Môr', earned: summary.learned >= 20),
+                      _Badge(emoji: '⛰️', label: 'Mountain', earned: summary.learned >= 10),
+                      _Badge(emoji: '🌊', label: 'Sea', earned: summary.learned >= 20),
                       _Badge(emoji: '💎', label: '30-day', earned: streak >= 30),
                     ],
                   ),

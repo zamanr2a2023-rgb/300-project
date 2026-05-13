@@ -211,7 +211,7 @@ class ProfileTabScreen extends ConsumerWidget {
                       _SettingsRow(
                         icon: Icons.language_rounded,
                         label: 'Dialect',
-                        value: profile?.dialect ?? 'Gogledd',
+                        value: profile?.dialect ?? 'North Wales',
                       ),
                       _SettingsRow(
                         icon: Icons.favorite_outline_rounded,
@@ -264,7 +264,7 @@ class ProfileTabScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Buy us a paned',
+                              'Buy us a cuppa',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,

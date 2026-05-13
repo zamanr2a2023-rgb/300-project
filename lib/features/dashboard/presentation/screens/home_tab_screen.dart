@@ -78,7 +78,7 @@ class HomeTabScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Bore da,',
+                                'Good morning,',
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
                                   color: AppColors.mutedFg,
@@ -301,7 +301,7 @@ class _HeroCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "TODAY'S PANED",
+            "TODAY'S LESSON",
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
               fontWeight: FontWeight.w800,
