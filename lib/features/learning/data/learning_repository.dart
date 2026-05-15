@@ -15,11 +15,11 @@ class LearningRepository {
 
   Future<void> recordReview({
     required String userId,
-    required String welsh,
+    required String wordId,
     required WordStatus status,
   }) async {
-    final prev = _demoProgress[welsh]?.reviews ?? 0;
-    _demoProgress[welsh] = WordProgressEntry(status: status, reviews: prev + 1);
+    final prev = _demoProgress[wordId]?.reviews ?? 0;
+    _demoProgress[wordId] = WordProgressEntry(status: status, reviews: prev + 1);
     final todayIdx = DateWeek.todayMondayFirstIndex();
     _demoWeekActivity[todayIdx] = _demoWeekActivity[todayIdx] + 1;
   }

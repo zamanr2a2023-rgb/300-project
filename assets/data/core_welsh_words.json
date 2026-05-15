@@ -1,0 +1,992 @@
+[
+  {
+    "id": "core_001",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Live (in a place)",
+    "welsh": "Byw",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 1
+  },
+  {
+    "id": "core_002",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Thing",
+    "welsh": "Peth",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 2
+  },
+  {
+    "id": "core_003",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Money",
+    "welsh": "Arian",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 3
+  },
+  {
+    "id": "core_004",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Special",
+    "welsh": "Arbennig",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 4
+  },
+  {
+    "id": "core_005",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Catch",
+    "welsh": "Dal",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 5
+  },
+  {
+    "id": "core_006",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Young",
+    "welsh": "Ifanc",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 6
+  },
+  {
+    "id": "core_007",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Ahead/Forward",
+    "welsh": "Ymlaen",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 7
+  },
+  {
+    "id": "core_008",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Programme",
+    "welsh": "Rhaglen",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 8
+  },
+  {
+    "id": "core_009",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Of course",
+    "welsh": "Wrth Gwrs",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 9
+  },
+  {
+    "id": "core_010",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Week",
+    "welsh": "Wythnos",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 10
+  },
+  {
+    "id": "core_011",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Put",
+    "welsh": "Rhoi",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 11
+  },
+  {
+    "id": "core_012",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Start",
+    "welsh": "Dechrau",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 12
+  },
+  {
+    "id": "core_013",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Full",
+    "welsh": "Llawn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 13
+  },
+  {
+    "id": "core_014",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Party (political)",
+    "welsh": "Plaid",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 14
+  },
+  {
+    "id": "core_015",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "First",
+    "welsh": "Cyntaf",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 15
+  },
+  {
+    "id": "core_016",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "House",
+    "welsh": "Tŷ",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 16
+  },
+  {
+    "id": "core_017",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Happen",
+    "welsh": "Digwydd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 17
+  },
+  {
+    "id": "core_018",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Area",
+    "welsh": "Ardal",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 18
+  },
+  {
+    "id": "core_019",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Year",
+    "welsh": "Blwyddyn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 19
+  },
+  {
+    "id": "core_020",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Day",
+    "welsh": "Diwrnod",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 20
+  },
+  {
+    "id": "core_021",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Member",
+    "welsh": "Aelod",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 21
+  },
+  {
+    "id": "core_022",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Search",
+    "welsh": "Chwilio",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 22
+  },
+  {
+    "id": "core_023",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Use",
+    "welsh": "Defnyddio",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 23
+  },
+  {
+    "id": "core_024",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Attention",
+    "welsh": "Sylw",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 24
+  },
+  {
+    "id": "core_025",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Any",
+    "welsh": "Unrhyw",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 25
+  },
+  {
+    "id": "core_026",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Things",
+    "welsh": "Pethau",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 26
+  },
+  {
+    "id": "core_027",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Whatever",
+    "welsh": "Beth Bynnag",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 27
+  },
+  {
+    "id": "core_028",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Believe",
+    "welsh": "Credu",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 28
+  },
+  {
+    "id": "core_029",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Period",
+    "welsh": "Cyfnod",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 29
+  },
+  {
+    "id": "core_030",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Local",
+    "welsh": "Lleol",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 30
+  },
+  {
+    "id": "core_031",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Knowledge",
+    "welsh": "Gwybodaeth",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 31
+  },
+  {
+    "id": "core_032",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Obvious",
+    "welsh": "Amlwg",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 32
+  },
+  {
+    "id": "core_033",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Website",
+    "welsh": "Gwefan",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 33
+  },
+  {
+    "id": "core_034",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Health",
+    "welsh": "Iechyd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 34
+  },
+  {
+    "id": "core_035",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Show",
+    "welsh": "Dangos",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 35
+  },
+  {
+    "id": "core_036",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Main",
+    "welsh": "Prif",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 36
+  },
+  {
+    "id": "core_037",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Next",
+    "welsh": "Nesaf",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 37
+  },
+  {
+    "id": "core_038",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Ask",
+    "welsh": "Gofyn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 38
+  },
+  {
+    "id": "core_039",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Move",
+    "welsh": "Symud",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 39
+  },
+  {
+    "id": "core_040",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Picture",
+    "welsh": "Llun",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 40
+  },
+  {
+    "id": "core_041",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Story",
+    "welsh": "Stori",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 41
+  },
+  {
+    "id": "core_042",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Opportunity",
+    "welsh": "Cyfle",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 42
+  },
+  {
+    "id": "core_043",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Remember",
+    "welsh": "Cofio",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 43
+  },
+  {
+    "id": "core_044",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "County",
+    "welsh": "Sir",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 44
+  },
+  {
+    "id": "core_045",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Something",
+    "welsh": "Rhywbeth",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 45
+  },
+  {
+    "id": "core_046",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Different",
+    "welsh": "Gwahanol",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 46
+  },
+  {
+    "id": "core_047",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Wait",
+    "welsh": "Aros",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 47
+  },
+  {
+    "id": "core_048",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Content",
+    "welsh": "Cynnwys",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 48
+  },
+  {
+    "id": "core_049",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "End",
+    "welsh": "Diwedd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 49
+  },
+  {
+    "id": "core_050",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Book",
+    "welsh": "Llyfr",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 50
+  },
+  {
+    "id": "core_051",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Response",
+    "welsh": "Ymateb",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 51
+  },
+  {
+    "id": "core_052",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Children",
+    "welsh": "Plant",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 52
+  },
+  {
+    "id": "core_053",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Important",
+    "welsh": "Pwysig",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 53
+  },
+  {
+    "id": "core_054",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Follow",
+    "welsh": "Dilyn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 54
+  },
+  {
+    "id": "core_055",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Research",
+    "welsh": "Ymchwil",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 55
+  },
+  {
+    "id": "core_056",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Family",
+    "welsh": "Teulu",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 56
+  },
+  {
+    "id": "core_057",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Example",
+    "welsh": "Enghraifft",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 57
+  },
+  {
+    "id": "core_058",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Unclear",
+    "welsh": "Aneglur",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 58
+  },
+  {
+    "id": "core_059",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Child",
+    "welsh": "Plentyn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 59
+  },
+  {
+    "id": "core_060",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Mention",
+    "welsh": "Sôn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 60
+  },
+  {
+    "id": "core_061",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Choose",
+    "welsh": "Dewis",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 61
+  },
+  {
+    "id": "core_062",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Church",
+    "welsh": "Eglwys",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 62
+  },
+  {
+    "id": "core_063",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Council / Advice",
+    "welsh": "Cyngor",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 63
+  },
+  {
+    "id": "core_064",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Best",
+    "welsh": "Gorau",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 64
+  },
+  {
+    "id": "core_065",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Fun",
+    "welsh": "Hwyl",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 65
+  },
+  {
+    "id": "core_066",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Take",
+    "welsh": "Cymryd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 66
+  },
+  {
+    "id": "core_067",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Fetch",
+    "welsh": "Nôl",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 67
+  },
+  {
+    "id": "core_068",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Feel",
+    "welsh": "Teimlo",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 68
+  },
+  {
+    "id": "core_069",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Life",
+    "welsh": "Bywyd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 69
+  },
+  {
+    "id": "core_070",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Hard/Difficult",
+    "welsh": "Anodd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 70
+  },
+  {
+    "id": "core_071",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Long",
+    "welsh": "Hir",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 71
+  },
+  {
+    "id": "core_072",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Schools",
+    "welsh": "Ysgolion",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 72
+  },
+  {
+    "id": "core_073",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Plan",
+    "welsh": "Cynllun",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 73
+  },
+  {
+    "id": "core_074",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Offer",
+    "welsh": "Cynnig",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 74
+  },
+  {
+    "id": "core_075",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Chat",
+    "welsh": "Sgwrs",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 75
+  },
+  {
+    "id": "core_076",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Idea",
+    "welsh": "Syniad",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 76
+  },
+  {
+    "id": "core_077",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Ready",
+    "welsh": "Barod",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 77
+  },
+  {
+    "id": "core_078",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "More",
+    "welsh": "Mwy",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 78
+  },
+  {
+    "id": "core_079",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Better",
+    "welsh": "Well",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 79
+  },
+  {
+    "id": "core_080",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Field",
+    "welsh": "Maes",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 80
+  },
+  {
+    "id": "core_081",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Think",
+    "welsh": "Meddwl",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 81
+  },
+  {
+    "id": "core_082",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Word",
+    "welsh": "Gair",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 82
+  },
+  {
+    "id": "core_083",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Music",
+    "welsh": "Cerddoriaeth",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 83
+  },
+  {
+    "id": "core_084",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Once",
+    "welsh": "Unwaith",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 84
+  },
+  {
+    "id": "core_085",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Answer",
+    "welsh": "Ateb",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 85
+  },
+  {
+    "id": "core_086",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Wolf",
+    "welsh": "Blaidd",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 86
+  },
+  {
+    "id": "core_087",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Evening",
+    "welsh": "Noson",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 87
+  },
+  {
+    "id": "core_088",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Leave",
+    "welsh": "Gadael",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 88
+  },
+  {
+    "id": "core_089",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Say",
+    "welsh": "Dweud",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 89
+  },
+  {
+    "id": "core_090",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Keep",
+    "welsh": "Cadw",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 90
+  },
+  {
+    "id": "core_091",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Create",
+    "welsh": "Creu",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 91
+  },
+  {
+    "id": "core_092",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Most",
+    "welsh": "Mwyaf",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 92
+  },
+  {
+    "id": "core_093",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Accept",
+    "welsh": "Derbyn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 93
+  },
+  {
+    "id": "core_094",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Consider",
+    "welsh": "Ystyried",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 94
+  },
+  {
+    "id": "core_095",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Win",
+    "welsh": "Ennill",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 95
+  },
+  {
+    "id": "core_096",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Sing",
+    "welsh": "Canu",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 96
+  },
+  {
+    "id": "core_097",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Hand",
+    "welsh": "Llaw",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 97
+  },
+  {
+    "id": "core_098",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Edition",
+    "welsh": "Rhifyn",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 98
+  },
+  {
+    "id": "core_099",
+    "deckId": "core_welsh_words",
+    "deckName": "Core Welsh Words",
+    "english": "Almost",
+    "welsh": "Bron",
+    "badge": "Core Welsh Word",
+    "image": null,
+    "order": 99
+  }
+]

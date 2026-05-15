@@ -7,12 +7,14 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/paned_logo.dart';
 import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
-import '../../../content/data/words_data.dart';
+import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
-import '../../../learning/domain/word_progress.dart';
-import '../../../learning/domain/word_status.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
+import '../providers/dashboard_tab_provider.dart';
+import '../providers/selected_deck_provider.dart';
+import '../widgets/deck_card.dart';
+import 'all_decks_screen.dart';
 
 class HomeTabScreen extends ConsumerWidget {
   const HomeTabScreen({super.key});
@@ -20,6 +22,7 @@ class HomeTabScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final learningAsync = ref.watch(learningViewModelProvider);
+    final catalogAsync = ref.watch(wordsCatalogProvider);
     final profileAsync = ref.watch(userProfileProvider);
     final session = ref.watch(authSessionProvider).valueOrNull;
 
@@ -27,25 +30,46 @@ class HomeTabScreen extends ConsumerWidget {
         ?? session?.displayName
         ?? 'Learner';
 
-    return learningAsync.when(
-      loading: () => const Scaffold(
+    if (catalogAsync.isLoading || learningAsync.isLoading) {
+      return const Scaffold(
         backgroundColor: AppColors.background,
         body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => Scaffold(
+      );
+    }
+    if (catalogAsync.hasError) {
+      return Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(child: Text('Error: $e')),
-      ),
-      data: (state) {
-        final summary = LearningMath.summarizeProgress(state.progress);
-        final streak = state.streak;
-        final accuracy = (summary.learned + summary.learning) > 0
-            ? ((summary.learned / (summary.learned + summary.learning)) * 100).round()
-            : 0;
+        body: Center(child: Text('Error: ${catalogAsync.error}')),
+      );
+    }
+    if (learningAsync.hasError) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: Text('Error: ${learningAsync.error}')),
+      );
+    }
 
-        final cats = _buildDecks(state.progress);
+    final catalog = catalogAsync.value!;
+    final state = learningAsync.value!;
 
-        return Scaffold(
+    final summary = LearningMath.summarizeProgress(
+      state.progress,
+      vocabularyTotal: catalog.all.length,
+    );
+    final streak = state.streak;
+    final accuracy = (summary.learned + summary.learning) > 0
+        ? ((summary.learned / (summary.learned + summary.learning)) * 100)
+            .round()
+        : 0;
+
+    final decks = buildDeckCards(state.progress, catalog);
+
+    void openDeck(String deckId) {
+      ref.read(selectedDeckIdProvider.notifier).state = deckId;
+      ref.read(panedDashboardTabIndexProvider.notifier).state = 1;
+    }
+
+    return Scaffold(
           backgroundColor: AppColors.background,
           body: SafeArea(
             top: false,
@@ -146,6 +170,7 @@ class HomeTabScreen extends ConsumerWidget {
                     child: _HeroCard(
                       learned: summary.learned,
                       streak: streak,
+                      onStart: () => openDeck(ref.read(selectedDeckIdProvider)),
                     ),
                   ),
                 ),
@@ -198,12 +223,22 @@ class HomeTabScreen extends ConsumerWidget {
                             color: AppColors.foreground,
                           ),
                         ),
-                        Text(
-                          'See all',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const AllDecksScreen(),
+                              ),
+                            );
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Text(
+                            'See all',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
                       ],
@@ -215,15 +250,18 @@ class HomeTabScreen extends ConsumerWidget {
 
                 // Deck items
                 SliverList.separated(
-                  itemCount: cats.length,
+                  itemCount: decks.length,
                   separatorBuilder: (_, index) =>
                       const SizedBox(height: AppSpacing.xs),
                   itemBuilder: (context, i) {
-                    final d = cats[i];
+                    final d = decks[i];
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.lg),
-                      child: _DeckTile(deck: d),
+                      child: DeckCardTile(
+                        deck: d,
+                        onTap: () => openDeck(d.id),
+                      ),
                     );
                   },
                 ),
@@ -233,47 +271,19 @@ class HomeTabScreen extends ConsumerWidget {
             ),
           ),
         );
-      },
-    );
   }
 
-  List<_DeckData> _buildDecks(ProgressMap progress) {
-    final cats = <String>{};
-    for (final w in WordsData.all) {
-      cats.add(w.category);
-    }
-    return cats.map((cat) {
-      final words = WordsData.all.where((w) => w.category == cat).toList();
-      final learned = words
-          .where((w) => progress[w.welsh]?.status == WordStatus.learned)
-          .length;
-      return _DeckData(
-        name: cat,
-        emoji: words.first.emoji,
-        count: words.length,
-        pct: words.isEmpty ? 0 : ((learned / words.length) * 100).round(),
-      );
-    }).toList();
-  }
-}
-
-class _DeckData {
-  const _DeckData({
-    required this.name,
-    required this.emoji,
-    required this.count,
-    required this.pct,
-  });
-  final String name;
-  final String emoji;
-  final int count;
-  final int pct;
 }
 
 class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.learned, required this.streak});
+  const _HeroCard({
+    required this.learned,
+    required this.streak,
+    required this.onStart,
+  });
   final int learned;
   final int streak;
+  final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
@@ -367,28 +377,31 @@ class _HeroCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Container(
-                height: 38,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.cream,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: AppColors.shadowSoft,
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.play_arrow_rounded,
-                        size: 16, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      learned > 0 ? 'Continue' : 'Start',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+              GestureDetector(
+                onTap: onStart,
+                child: Container(
+                  height: 38,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.cream,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: AppColors.shadowSoft,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.play_arrow_rounded,
+                          size: 16, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        learned > 0 ? 'Continue' : 'Start',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -464,80 +477,6 @@ class _StatCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _DeckTile extends StatelessWidget {
-  const _DeckTile({required this.deck});
-  final _DeckData deck;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: AppColors.ringLeaf,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.secondary,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(deck.emoji, style: const TextStyle(fontSize: 22)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  deck.name,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.foreground,
-                  ),
-                ),
-                Text(
-                  '${deck.count} words',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    color: AppColors.mutedFg,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(3),
-                  child: LinearProgressIndicator(
-                    value: deck.pct / 100,
-                    minHeight: 4,
-                    backgroundColor: AppColors.muted,
-                    valueColor: AlwaysStoppedAnimation(AppColors.primary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            '${deck.pct}%',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppColors.mutedFg,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -3,15 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/services/welsh_tts_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/paned_status_bar.dart';
-import '../../../content/data/words_data.dart';
+import '../../../content/data/decks_data.dart';
+import '../../../content/domain/deck.dart';
 import '../../../content/domain/word.dart';
+import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/word_progress.dart';
 import '../../../learning/domain/word_status.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
 import '../providers/dashboard_tab_provider.dart';
+import '../providers/selected_deck_provider.dart';
 
 class LearnTabScreen extends ConsumerStatefulWidget {
   const LearnTabScreen({super.key});
@@ -26,22 +30,32 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
   Offset? _drag;
   Offset? _start;
 
-  List<Word> _buildQueue(ProgressMap progress) {
+  List<Word> _buildQueue(ProgressMap progress, List<Word> deckWords) {
     final pending = [
-      ...WordsData.all.where((w) => progress[w.welsh]?.status == WordStatus.learning),
-      ...WordsData.all.where((w) =>
-          !progress.containsKey(w.welsh) ||
-          progress[w.welsh]!.status == WordStatus.newWord),
+      ...deckWords.where(
+          (w) => progress[w.id]?.status == WordStatus.sortOfKnow),
+      ...deckWords.where(
+          (w) => progress[w.id]?.status == WordStatus.dontKnow),
+      ...deckWords.where((w) {
+        final status = progress[w.id]?.status ?? WordStatus.unseen;
+        return status == WordStatus.unseen;
+      }),
     ];
-    return pending.isEmpty ? WordsData.all : pending;
+    return pending;
   }
 
+  WordStatus _statusForAction(_SwipeAction action) => switch (action) {
+        _SwipeAction.know => WordStatus.known,
+        _SwipeAction.sort => WordStatus.sortOfKnow,
+        _SwipeAction.dontKnow => WordStatus.dontKnow,
+      };
+
   Future<void> _handleAction(_SwipeAction action, Word word) async {
-    final status =
-        action == _SwipeAction.know ? WordStatus.learned : WordStatus.learning;
-    await ref
-        .read(learningViewModelProvider.notifier)
-        .recordReview(welsh: word.welsh, status: status);
+    await ref.read(vocabularyTtsServiceProvider).stop();
+    await ref.read(learningViewModelProvider.notifier).recordReview(
+          wordId: word.id,
+          status: _statusForAction(action),
+        );
     if (mounted) {
       setState(() {
         _idx++;
@@ -52,29 +66,102 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
     }
   }
 
+  Future<void> _speakWord(Word word, {required bool flipped}) {
+    final tts = ref.read(vocabularyTtsServiceProvider);
+    if (flipped) {
+      return tts.speakWelsh(word.welsh);
+    }
+    return tts.speakEnglish(word.english);
+  }
+
   @override
   Widget build(BuildContext context) {
     final learningAsync = ref.watch(learningViewModelProvider);
+    final catalogAsync = ref.watch(wordsCatalogProvider);
+    final deckId = ref.watch(selectedDeckIdProvider);
+    final deck = DecksData.byId(deckId);
 
-    return learningAsync.when(
-      loading: () => const Scaffold(
+    ref.listen(selectedDeckIdProvider, (prev, next) {
+      if (prev != next) {
+        ref.read(vocabularyTtsServiceProvider).stop();
+        setState(() {
+          _idx = 0;
+          _flipped = false;
+          _drag = null;
+          _start = null;
+        });
+      }
+    });
+
+    if (catalogAsync.isLoading || learningAsync.isLoading) {
+      return const Scaffold(
         backgroundColor: AppColors.background,
         body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => Scaffold(
+      );
+    }
+    if (catalogAsync.hasError) {
+      return Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(child: Text('$e')),
-      ),
-      data: (state) {
-        final queue = _buildQueue(state.progress);
-        if (queue.isEmpty) return const _AllDone();
+        body: Center(child: Text('$catalogAsync.error')),
+      );
+    }
+    if (learningAsync.hasError) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: Text('$learningAsync.error')),
+      );
+    }
 
-        final safeIdx = _idx % queue.length;
-        final current = queue[safeIdx];
-        final next = queue[(safeIdx + 1) % queue.length];
-        final total = queue.length;
-        final pct = total == 0 ? 0.0 : safeIdx / total;
-        final wordStatus = state.progress[current.welsh]?.status ?? WordStatus.newWord;
+    final catalog = catalogAsync.value!;
+    final state = learningAsync.value!;
+    final deckWords = catalog.forDeck(deckId);
+    final queue = _buildQueue(state.progress, deckWords);
+
+    if (deckWords.isEmpty) {
+      return _DeckEmpty(
+        deckName: deck?.name ?? 'This deck',
+        mastered: false,
+      );
+    }
+    if (queue.isEmpty) {
+      return _DeckEmpty(
+        deckName: deck?.name ?? 'This deck',
+        mastered: true,
+      );
+    }
+
+    final safeIdx = _idx % queue.length;
+    final current = queue[safeIdx];
+    final next = queue[(safeIdx + 1) % queue.length];
+    final total = queue.length;
+    final pct = total == 0 ? 0.0 : safeIdx / total;
+    final wordStatus =
+        state.progress[current.id]?.status ?? WordStatus.unseen;
+
+    return _buildLearnScaffold(
+      context: context,
+      deck: deck,
+      current: current,
+      next: next,
+      total: total,
+      pct: pct,
+      wordStatus: wordStatus,
+      safeIdx: safeIdx,
+      onSpeak: () => _speakWord(current, flipped: _flipped),
+    );
+  }
+
+  Widget _buildLearnScaffold({
+    required BuildContext context,
+    required Deck? deck,
+    required Word current,
+    required Word next,
+    required int total,
+    required double pct,
+    required WordStatus wordStatus,
+    required int safeIdx,
+    required VoidCallback onSpeak,
+  }) {
 
         // Determine live gesture hint
         _SwipeAction? hint;
@@ -158,7 +245,7 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        current.category.toUpperCase(),
+                        (deck?.badgeText ?? 'WORD').toUpperCase(),
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
@@ -256,6 +343,7 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                                 flipped: _flipped,
                                 status: wordStatus,
                                 hint: hint,
+                                onSpeak: onSpeak,
                               ),
                             ),
                           ),
@@ -312,18 +400,25 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
             ),
           ),
         );
-      },
-    );
   }
 }
 
 // ──────────────────────────────────────────────────────────────────
 
-class _AllDone extends ConsumerWidget {
-  const _AllDone();
+class _DeckEmpty extends ConsumerWidget {
+  const _DeckEmpty({required this.deckName, required this.mastered});
+
+  final String deckName;
+  final bool mastered;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final emoji = mastered ? '🎉' : '📖';
+    final title = mastered ? 'Well done!' : 'Coming soon';
+    final message = mastered
+        ? 'You\'ve mastered every word in $deckName.\nCheck back tomorrow for review.'
+        : '$deckName is being prepared.\nWords will appear here soon.';
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: MeshBackground(
@@ -348,12 +443,12 @@ class _AllDone extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: Center(
-                            child: Text('🎉', style: const TextStyle(fontSize: 40)),
+                            child: Text(emoji, style: const TextStyle(fontSize: 40)),
                           ),
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Well done!',
+                          title,
                           style: GoogleFonts.dmSerifDisplay(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
@@ -362,7 +457,7 @@ class _AllDone extends ConsumerWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'You\'ve mastered every word.\nCheck back tomorrow for review.',
+                          message,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
@@ -370,12 +465,20 @@ class _AllDone extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        FilledButton(
-                          onPressed: () {
-                            ref.read(panedDashboardTabIndexProvider.notifier).state = 2;
-                          },
-                          child: const Text('View progress'),
-                        ),
+                        if (mastered)
+                          FilledButton(
+                            onPressed: () {
+                              ref.read(panedDashboardTabIndexProvider.notifier).state = 2;
+                            },
+                            child: const Text('View progress'),
+                          )
+                        else
+                          FilledButton(
+                            onPressed: () {
+                              ref.read(panedDashboardTabIndexProvider.notifier).state = 0;
+                            },
+                            child: const Text('Back to decks'),
+                          ),
                       ],
                     ),
                   ),
@@ -391,17 +494,33 @@ class _AllDone extends ConsumerWidget {
 
 // ──────────────────────────────────────────────────────────────────
 
+String _statusLabel(WordStatus status) => switch (status) {
+      WordStatus.known => 'Known',
+      WordStatus.sortOfKnow => 'Sort of',
+      WordStatus.dontKnow => 'Practice',
+      WordStatus.unseen => 'New word',
+    };
+
+Color _statusColor(WordStatus status) => switch (status) {
+      WordStatus.known => AppColors.primary,
+      WordStatus.sortOfKnow => AppColors.accent,
+      WordStatus.dontKnow => AppColors.foreground,
+      WordStatus.unseen => AppColors.primary,
+    };
+
 class _FlashCard extends StatelessWidget {
   const _FlashCard({
     required this.word,
     required this.flipped,
     required this.status,
+    required this.onSpeak,
     this.hint,
   });
 
   final Word word;
   final bool flipped;
   final WordStatus status;
+  final VoidCallback onSpeak;
   final _SwipeAction? hint;
 
   @override
@@ -429,32 +548,35 @@ class _FlashCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: status == WordStatus.learning
-                            ? AppColors.accent.withValues(alpha: 0.1)
-                            : AppColors.primary.withValues(alpha: 0.1),
+                        color: _statusColor(status).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        status == WordStatus.learning ? 'Review' : 'New word',
+                        _statusLabel(status),
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: status == WordStatus.learning
-                              ? AppColors.accent
-                              : AppColors.primary,
+                          color: _statusColor(status),
                           letterSpacing: 0.5,
                         ),
                       ),
                     ),
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary,
-                        shape: BoxShape.circle,
+                    Material(
+                      color: AppColors.secondary,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        onTap: onSpeak,
+                        customBorder: const CircleBorder(),
+                        child: SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: Icon(
+                            Icons.volume_up_rounded,
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
-                      child: Icon(Icons.volume_up_rounded,
-                          size: 16, color: AppColors.primary),
                     ),
                   ],
                 ),

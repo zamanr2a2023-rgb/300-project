@@ -1,4 +1,3 @@
-import '../../content/data/words_data.dart';
 import 'word_progress.dart';
 import 'word_status.dart';
 
@@ -21,11 +20,18 @@ abstract final class LearningMath {
     int learning,
     int total,
     int pct,
-  }) summarizeProgress(ProgressMap progress) {
+  }) summarizeProgress(
+    ProgressMap progress, {
+    required int vocabularyTotal,
+  }) {
     final vals = progress.values;
-    final learned = vals.where((p) => p.status == WordStatus.learned).length;
-    final learning = vals.where((p) => p.status == WordStatus.learning).length;
-    final total = WordsData.all.length;
+    final learned = vals.where((p) => p.status == WordStatus.known).length;
+    final learning = vals
+        .where((p) =>
+            p.status == WordStatus.sortOfKnow ||
+            p.status == WordStatus.dontKnow)
+        .length;
+    final total = vocabularyTotal;
     final pct = total == 0 ? 0 : ((learned / total) * 100).round();
     return (learned: learned, learning: learning, total: total, pct: pct);
   }

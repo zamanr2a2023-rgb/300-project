@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../auth/presentation/providers/auth_repository_provider.dart';
+import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
@@ -17,6 +18,7 @@ class ProfileTabScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final learningAsync = ref.watch(learningViewModelProvider);
+    final catalogAsync = ref.watch(wordsCatalogProvider);
     final profileAsync = ref.watch(userProfileProvider);
     final session = ref.watch(authSessionProvider).valueOrNull;
 
@@ -25,8 +27,12 @@ class ProfileTabScreen extends ConsumerWidget {
     final email = session?.email ?? '';
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
 
+    final vocabularyTotal = catalogAsync.valueOrNull?.all.length ?? 0;
     final summary = learningAsync.valueOrNull != null
-        ? LearningMath.summarizeProgress(learningAsync.valueOrNull!.progress)
+        ? LearningMath.summarizeProgress(
+            learningAsync.valueOrNull!.progress,
+            vocabularyTotal: vocabularyTotal,
+          )
         : (learned: 0, learning: 0, total: 0, pct: 0);
     final streak = learningAsync.valueOrNull?.streak ?? 0;
     final level = (summary.learned ~/ 10 + 1).clamp(1, 999);

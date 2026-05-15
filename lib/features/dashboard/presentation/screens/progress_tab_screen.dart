@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/paned_status_bar.dart';
+import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
@@ -15,7 +16,15 @@ class ProgressTabScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final learningAsync = ref.watch(learningViewModelProvider);
+    final catalogAsync = ref.watch(wordsCatalogProvider);
     final profileAsync = ref.watch(userProfileProvider);
+
+    if (catalogAsync.isLoading || learningAsync.isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return learningAsync.when(
       loading: () => const Scaffold(
@@ -27,7 +36,11 @@ class ProgressTabScreen extends ConsumerWidget {
         body: Center(child: Text('$e')),
       ),
       data: (state) {
-        final summary = LearningMath.summarizeProgress(state.progress);
+        final vocabularyTotal = catalogAsync.value?.all.length ?? 0;
+        final summary = LearningMath.summarizeProgress(
+          state.progress,
+          vocabularyTotal: vocabularyTotal,
+        );
         final streak = state.streak;
         final profile = profileAsync.valueOrNull;
         final firstName =
