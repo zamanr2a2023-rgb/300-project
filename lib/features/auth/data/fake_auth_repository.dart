@@ -29,6 +29,9 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Stream<UserSession?> authStateChanges() => sessionStream;
+
+  @override
   Future<UserSession?> restoreSession() async => _session;
 
   @override

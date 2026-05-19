@@ -230,6 +230,7 @@ class ProfileTabScreen extends ConsumerWidget {
                         onTap: () async {
                           final repo = ref.read(authRepositoryProvider);
                           await repo.signOut();
+                          ref.invalidate(learningViewModelProvider);
                         },
                       ),
                     ],

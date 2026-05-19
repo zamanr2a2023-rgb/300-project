@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "797664372754",
+    "project_id": "paned-225e3",
+    "storage_bucket": "paned-225e3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797664372754:android:684111a923a7898d0a10cb",
+        "android_client_info": {
+          "package_name": "com.paned.app.paned_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvlkY9qki4t4hC5YrCxsxBlyWy2vaSoS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -64,6 +64,7 @@ class LearningViewModel extends AsyncNotifier<LearningUiState> {
   /// Optimistic UI matching `AuthedApp.handleReview` in the web app.
   Future<void> recordReview({
     required String wordId,
+    required String deckId,
     required WordStatus status,
   }) async {
     final uid = ref.read(authSessionProvider).valueOrNull?.id;
@@ -71,10 +72,11 @@ class LearningViewModel extends AsyncNotifier<LearningUiState> {
     if (uid == null || current == null) return;
 
     final prevCount = current.progress[wordId]?.reviews ?? 0;
+    final reviewCount = prevCount + 1;
     final nextProgress = Map<String, WordProgressEntry>.from(current.progress);
     nextProgress[wordId] = WordProgressEntry(
       status: status,
-      reviews: prevCount + 1,
+      reviews: reviewCount,
     );
 
     final todayIdx = DateWeek.todayMondayFirstIndex();
@@ -91,7 +93,9 @@ class LearningViewModel extends AsyncNotifier<LearningUiState> {
       await ref.read(learningRepositoryProvider).recordReview(
             userId: uid,
             wordId: wordId,
+            deckId: deckId,
             status: status,
+            reviewCount: reviewCount,
           );
     } catch (_) {
       state = AsyncData(current);

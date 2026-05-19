@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/auth_service.dart';
 import '../providers/auth_repository_provider.dart';
 
 /// UI state for the auth form — decoupled from LoginScreen widget.
@@ -36,7 +37,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
           );
       state = const AuthState();
     } catch (e) {
-      _error(e.toString());
+      _error(_messageFor(e));
     }
   }
 
@@ -54,21 +55,16 @@ class AuthViewModel extends StateNotifier<AuthState> {
           );
       state = const AuthState();
     } catch (e) {
-      _error(e.toString());
-    }
-  }
-
-  Future<void> signInWithGoogle() async {
-    _loading();
-    try {
-      await _ref.read(authRepositoryProvider).signInWithGoogle();
-      state = const AuthState();
-    } catch (e) {
-      _error(e.toString());
+      _error(_messageFor(e));
     }
   }
 
   void clearError() => state = state.copyWith(errorMessage: null);
+
+  String _messageFor(Object e) {
+    if (e is AuthServiceException) return e.message;
+    return e.toString();
+  }
 
   void _loading() => state = const AuthState(isLoading: true);
 

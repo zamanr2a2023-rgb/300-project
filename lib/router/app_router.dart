@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/domain/user_session.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
+import '../features/auth/presentation/screens/signup_screen.dart';
 import '../features/auth/presentation/screens/splash_screen.dart';
 import '../features/auth/presentation/providers/auth_session_provider.dart';
 import '../features/dashboard/presentation/screens/dashboard_shell.dart';
@@ -86,6 +87,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoute.login,
         pageBuilder: (context, state) => const NoTransitionPage<void>(
           child: LoginScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.signup,
+        pageBuilder: (context, state) => const NoTransitionPage<void>(
+          child: SignUpScreen(),
         ),
       ),
       GoRoute(

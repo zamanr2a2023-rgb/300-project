@@ -54,6 +54,7 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
     await ref.read(vocabularyTtsServiceProvider).stop();
     await ref.read(learningViewModelProvider.notifier).recordReview(
           wordId: word.id,
+          deckId: word.deckId,
           status: _statusForAction(action),
         );
     if (mounted) {

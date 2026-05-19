@@ -12,20 +12,22 @@ import '../../../../router/routes.dart';
 import '../view_models/auth_view_model.dart';
 import '../widgets/auth_form_widgets.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends ConsumerStatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+  final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
+    _name.dispose();
     _email.dispose();
     _password.dispose();
     super.dispose();
@@ -34,7 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit(AuthViewModel vm) async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     FocusScope.of(context).unfocus();
-    await vm.signInWithEmail(_email.text, _password.text);
+    await vm.signUpWithEmail(_email.text, _password.text, _name.text.trim());
   }
 
   @override
@@ -85,7 +87,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Welcome back!\nTime for a cuppa.',
+                          'Welcome!\nLet\'s build a habit.',
                           style: GoogleFonts.playfairDisplay(
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
@@ -95,13 +97,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Sign in to continue your streak.',
+                          'Create an account to save your progress.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             color: AppColors.mutedFg,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
+                        const AuthFieldLabel('Name'),
+                        const SizedBox(height: 6),
+                        AuthTextField(
+                          controller: _name,
+                          hint: 'Alex',
+                          autofillHints: const [AutofillHints.name],
+                          validator: (v) =>
+                              (v == null || v.trim().length < 2)
+                                  ? 'At least 2 characters'
+                                  : null,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
                         const AuthFieldLabel('Email'),
                         const SizedBox(height: 6),
                         AuthTextField(
@@ -123,20 +137,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 6),
                         AuthTextField(
                           controller: _password,
-                          hint: 'Your password',
+                          hint: 'At least 6 characters',
                           obscureText: true,
-                          autofillHints: const [AutofillHints.password],
+                          autofillHints: const [AutofillHints.newPassword],
                           validator: (v) {
                             if (v == null || v.isEmpty) {
-                              return 'Enter your password';
+                              return 'Enter a password';
                             }
-                            if (v.length < 6) return 'Min 6 characters';
+                            if (v.length < 6) {
+                              return 'Use at least 6 characters';
+                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AuthPrimaryButton(
-                          label: 'Log in',
+                          label: 'Create account',
                           busy: busy,
                           onPressed: busy ? null : () => _submit(vm),
                         ),
@@ -145,9 +161,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                           child: Center(
                             child: AuthToggleText(
-                              prefix: 'New here? ',
-                              action: 'Create account',
-                              onTap: busy ? () {} : () => context.push(AppRoute.signup),
+                              prefix: 'Already have an account? ',
+                              action: 'Log in',
+                              onTap: busy
+                                  ? () {}
+                                  : () => context.go(AppRoute.login),
                             ),
                           ),
                         ),
