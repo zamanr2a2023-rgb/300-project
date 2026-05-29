@@ -102,7 +102,7 @@ class HomeTabScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Good morning,',
+                                "Shw'mae Dysgwr",
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
                                   color: AppColors.mutedFg,

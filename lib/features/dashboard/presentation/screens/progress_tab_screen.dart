@@ -43,8 +43,6 @@ class ProgressTabScreen extends ConsumerWidget {
         );
         final streak = state.streak;
         final profile = profileAsync.valueOrNull;
-        final firstName =
-            (profile?.displayName ?? 'you').split(' ').first;
         final goal = profile?.dailyGoal ?? 20;
         final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
         final weekActivity = state.weekActivity;
@@ -81,7 +79,7 @@ class ProgressTabScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Well done, $firstName.',
+                          'Da iawn, Dysgwr',
                           style: GoogleFonts.dmSerifDisplay(
                             fontSize: 30,
                             fontWeight: FontWeight.w900,

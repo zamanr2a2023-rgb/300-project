@@ -27,6 +27,7 @@ class LearnTabScreen extends ConsumerStatefulWidget {
 class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
   int _idx = 0;
   bool _flipped = false;
+  bool _isSubmittingReview = false;
   Offset? _drag;
   Offset? _start;
 
@@ -52,14 +53,28 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
 
   Future<void> _handleAction(_SwipeAction action, Word word) async {
     await ref.read(vocabularyTtsServiceProvider).stop();
-    await ref.read(learningViewModelProvider.notifier).recordReview(
-          wordId: word.id,
-          deckId: word.deckId,
-          status: _statusForAction(action),
-        );
     if (mounted) {
+      setState(() => _isSubmittingReview = true);
+    }
+    try {
+      await ref.read(learningViewModelProvider.notifier).recordReview(
+            wordId: word.id,
+            deckId: word.deckId,
+            status: _statusForAction(action),
+          );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmittingReview = false);
+      }
+    }
+    if (mounted) {
+      // Keep "Know it" on same logical index (known words are removed from queue),
+      // but advance for partial/unknown answers so users always see a new card.
+      final shouldAdvanceIndex = action != _SwipeAction.know;
       setState(() {
-        _idx++;
+        if (shouldAdvanceIndex) {
+          _idx++;
+        }
         _flipped = false;
         _drag = null;
         _start = null;
@@ -314,37 +329,51 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                           child: Transform.rotate(
                             angle: (_drag?.dx ?? 0) * 0.0005,
                             child: GestureDetector(
-                              onPanStart: (d) {
-                                _start = d.globalPosition;
-                              },
-                              onPanUpdate: (d) {
-                                setState(() {
-                                  _drag = d.globalPosition - (_start ?? d.globalPosition);
-                                });
-                              },
-                              onPanEnd: (_) {
-                                final d = _drag ?? Offset.zero;
-                                final th = 90.0;
-                                if (d.dy < -th && d.dy.abs() > d.dx.abs()) {
-                                  _handleAction(_SwipeAction.know, current);
-                                } else if (d.dx > th) {
-                                  _handleAction(_SwipeAction.sort, current);
-                                } else if (d.dx < -th) {
-                                  _handleAction(_SwipeAction.dontKnow, current);
-                                } else {
-                                  setState(() {
-                                    _drag = null;
-                                    _start = null;
-                                  });
-                                }
-                              },
-                              onTap: () => setState(() => _flipped = !_flipped),
+                              onPanStart: _isSubmittingReview
+                                  ? null
+                                  : (d) {
+                                      _start = d.globalPosition;
+                                    },
+                              onPanUpdate: _isSubmittingReview
+                                  ? null
+                                  : (d) {
+                                      setState(() {
+                                        _drag = d.globalPosition -
+                                            (_start ?? d.globalPosition);
+                                      });
+                                    },
+                              onPanEnd: _isSubmittingReview
+                                  ? null
+                                  : (_) {
+                                      final d = _drag ?? Offset.zero;
+                                      final th = 90.0;
+                                      if (d.dy < -th &&
+                                          d.dy.abs() > d.dx.abs()) {
+                                        _handleAction(
+                                            _SwipeAction.know, current);
+                                      } else if (d.dx > th) {
+                                        _handleAction(
+                                            _SwipeAction.sort, current);
+                                      } else if (d.dx < -th) {
+                                        _handleAction(
+                                            _SwipeAction.dontKnow, current);
+                                      } else {
+                                        setState(() {
+                                          _drag = null;
+                                          _start = null;
+                                        });
+                                      }
+                                    },
+                              onTap: _isSubmittingReview
+                                  ? null
+                                  : () => setState(() => _flipped = !_flipped),
                               child: _FlashCard(
                                 word: current,
                                 flipped: _flipped,
                                 status: wordStatus,
                                 hint: hint,
                                 onSpeak: onSpeak,
+                                isLoadingWord: _isSubmittingReview,
                               ),
                             ),
                           ),
@@ -373,20 +402,26 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                         icon: Icons.arrow_back_rounded,
                         label: "Don't know",
                         tone: _BtnTone.muted,
-                        onTap: () => _handleAction(_SwipeAction.dontKnow, current),
+                        onTap: _isSubmittingReview
+                            ? () {}
+                            : () => _handleAction(_SwipeAction.dontKnow, current),
                       ),
                       _ActionBtn(
                         icon: Icons.arrow_upward_rounded,
                         label: 'Know it',
                         tone: _BtnTone.primary,
                         big: true,
-                        onTap: () => _handleAction(_SwipeAction.know, current),
+                        onTap: _isSubmittingReview
+                            ? () {}
+                            : () => _handleAction(_SwipeAction.know, current),
                       ),
                       _ActionBtn(
                         icon: Icons.arrow_forward_rounded,
                         label: 'Sort of',
                         tone: _BtnTone.accent,
-                        onTap: () => _handleAction(_SwipeAction.sort, current),
+                        onTap: _isSubmittingReview
+                            ? () {}
+                            : () => _handleAction(_SwipeAction.sort, current),
                       ),
                     ],
                   ),
@@ -515,6 +550,7 @@ class _FlashCard extends StatelessWidget {
     required this.flipped,
     required this.status,
     required this.onSpeak,
+    this.isLoadingWord = false,
     this.hint,
   });
 
@@ -522,6 +558,7 @@ class _FlashCard extends StatelessWidget {
   final bool flipped;
   final WordStatus status;
   final VoidCallback onSpeak;
+  final bool isLoadingWord;
   final _SwipeAction? hint;
 
   @override
@@ -586,86 +623,52 @@ class _FlashCard extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(word.emoji, style: const TextStyle(fontSize: 56)),
-                      const SizedBox(height: 12),
-                      if (!flipped) ...[
-                        Text(
-                          'ENGLISH',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.mutedFg,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          word.english,
-                          style: GoogleFonts.dmSerifDisplay(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.foreground,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Do you know the Welsh word?',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
-                            color: AppColors.mutedFg,
-                          ),
-                        ),
-                      ] else ...[
-                        Text(
-                          'WELSH',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.leaf,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          word.welsh,
-                          style: GoogleFonts.dmSerifDisplay(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '/${word.pronunciation}/',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                            color: AppColors.mutedFg,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          word.english,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            color: AppColors.foreground.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ],
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 380),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, animation) {
+                          final scale = Tween<double>(begin: 0.82, end: 1).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          );
+                          return FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: scale,
+                              alignment: Alignment.center,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: isLoadingWord
+                            ? const SizedBox(
+                                key: ValueKey('loading'),
+                                width: 32,
+                                height: 32,
+                                child: CircularProgressIndicator(strokeWidth: 3),
+                              )
+                            : _FlashCardWordBody(
+                                key: ValueKey(word.id),
+                                word: word,
+                                flipped: flipped,
+                              ),
+                      ),
                     ],
                   ),
                 ),
-                Text(
-                  flipped
-                      ? 'Swipe to grade yourself'
-                      : 'Tap to reveal · swipe to grade',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10,
-                    color: AppColors.mutedFg,
+                if (!isLoadingWord)
+                  Text(
+                    flipped
+                        ? 'Swipe to grade yourself'
+                        : 'Tap to reveal · swipe to grade',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: AppColors.mutedFg,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -678,6 +681,96 @@ class _FlashCard extends StatelessWidget {
             _Overlay(label: 'Practice', color: AppColors.foreground, pos: _OverlayPos.left),
         ],
       ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+
+class _FlashCardWordBody extends StatelessWidget {
+  const _FlashCardWordBody({
+    super.key,
+    required this.word,
+    required this.flipped,
+  });
+
+  final Word word;
+  final bool flipped;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(word.emoji, style: const TextStyle(fontSize: 56)),
+        const SizedBox(height: 12),
+        if (!flipped) ...[
+          Text(
+            'ENGLISH',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              color: AppColors.mutedFg,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            word.english,
+            style: GoogleFonts.dmSerifDisplay(
+              fontSize: 40,
+              fontWeight: FontWeight.w900,
+              color: AppColors.foreground,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Do you know the Welsh word?',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              color: AppColors.mutedFg,
+            ),
+          ),
+        ] else ...[
+          Text(
+            'WELSH',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              color: AppColors.leaf,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            word.welsh,
+            style: GoogleFonts.dmSerifDisplay(
+              fontSize: 40,
+              fontWeight: FontWeight.w900,
+              color: AppColors.primary,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '/${word.pronunciation}/',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: AppColors.mutedFg,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            word.english,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              color: AppColors.foreground.withValues(alpha: 0.7),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

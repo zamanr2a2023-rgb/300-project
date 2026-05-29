@@ -215,11 +215,6 @@ class ProfileTabScreen extends ConsumerWidget {
                         value: '08:30',
                       ),
                       _SettingsRow(
-                        icon: Icons.language_rounded,
-                        label: 'Dialect',
-                        value: profile?.dialect ?? 'North Wales',
-                      ),
-                      _SettingsRow(
                         icon: Icons.favorite_outline_rounded,
                         label: 'Invite a friend',
                       ),
