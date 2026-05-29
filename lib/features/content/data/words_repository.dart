@@ -1,6 +1,5 @@
 import '../domain/word.dart';
-import 'core_words_loader.dart';
-import 'words_data.dart';
+import 'vocabulary_loader.dart';
 
 class WordsCatalog {
   const WordsCatalog({required this.all});
@@ -18,8 +17,7 @@ class WordsRepository {
     if (_cache != null) {
       return WordsCatalog(all: _cache!);
     }
-    final core = await CoreWordsLoader.load();
-    _cache = [...core, ...WordsData.starterWords];
+    _cache = await VocabularyLoader.loadAllBundled();
     return WordsCatalog(all: _cache!);
   }
 }
