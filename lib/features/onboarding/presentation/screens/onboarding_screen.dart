@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../../router/routes.dart';
 import '../providers/onboarding_provider.dart';
 
@@ -27,7 +26,6 @@ class OnboardingScreen extends ConsumerWidget {
         bottom: true,
         child: Column(
           children: [
-            const PanedStatusBar(),
             // Header
             Padding(
               padding: const EdgeInsets.symmetric(

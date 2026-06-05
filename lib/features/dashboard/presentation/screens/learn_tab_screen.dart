@@ -6,7 +6,6 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/services/welsh_tts_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/mesh_background.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../content/data/decks_data.dart';
 import '../../../content/domain/deck.dart';
 import '../../../content/domain/word.dart';
@@ -206,15 +205,10 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: MeshBackground(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const PanedStatusBar(),
-                Expanded(
-                  child: SafeArea(
-                    top: false,
-                    child: Column(
-                      children: [
+            child: SafeArea(
+              bottom: true,
+              child: Column(
+                children: [
                 // Top bar
                 Padding(
                   padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, 0),
@@ -428,11 +422,8 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                 ),
 
                 const SizedBox(height: AppSpacing.xs),
-              ],
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -458,14 +449,9 @@ class _DeckEmpty extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: MeshBackground(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const PanedStatusBar(),
-            Expanded(
-              child: SafeArea(
-                top: false,
-                child: Center(
+        child: SafeArea(
+          bottom: true,
+          child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(32),
                     child: Column(
@@ -519,9 +505,6 @@ class _DeckEmpty extends ConsumerWidget {
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
         ),
       ),
     );

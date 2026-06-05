@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../auth/presentation/providers/auth_repository_provider.dart';
 import '../../../content/presentation/providers/words_catalog_provider.dart';
@@ -40,11 +39,9 @@ class ProfileTabScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        top: false,
         bottom: true,
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(child: PanedStatusBar()),
             // Header
             SliverToBoxAdapter(
               child: Padding(

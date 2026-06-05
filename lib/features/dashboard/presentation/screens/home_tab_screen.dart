@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/paned_logo.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
@@ -72,11 +71,9 @@ class HomeTabScreen extends ConsumerWidget {
     return Scaffold(
           backgroundColor: AppColors.background,
           body: SafeArea(
-            top: false,
             bottom: true,
             child: CustomScrollView(
               slivers: [
-                const SliverToBoxAdapter(child: PanedStatusBar()),
                 // Header
                 SliverToBoxAdapter(
                   child: Padding(
@@ -169,6 +166,7 @@ class HomeTabScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     child: _HeroCard(
                       learned: summary.learned,
+                      totalWords: catalog.all.length,
                       streak: streak,
                       onStart: () => openDeck(ref.read(selectedDeckIdProvider)),
                     ),
@@ -275,19 +273,36 @@ class HomeTabScreen extends ConsumerWidget {
 
 }
 
+String _formatCount(int value) {
+  final text = value.toString();
+  if (text.length <= 3) return text;
+  final buffer = StringBuffer();
+  for (var i = 0; i < text.length; i++) {
+    if (i > 0 && (text.length - i) % 3 == 0) {
+      buffer.write(',');
+    }
+    buffer.write(text[i]);
+  }
+  return buffer.toString();
+}
+
 class _HeroCard extends StatelessWidget {
   const _HeroCard({
     required this.learned,
+    required this.totalWords,
     required this.streak,
     required this.onStart,
   });
   final int learned;
+  final int totalWords;
   final int streak;
   final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
-    final pct = (learned / 3000).clamp(0.0, 1.0);
+    final goal = totalWords > 0 ? totalWords : 1;
+    final pct = (learned / goal).clamp(0.0, 1.0);
+    final goalLabel = _formatCount(goal);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -339,7 +354,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Goal: 3,000 words to fluency',
+            'Goal: $goalLabel words in Paned',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -366,7 +381,7 @@ class _HeroCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '$learned / 3,000 · ${(pct * 100).round()}%',
+                      '${_formatCount(learned)} / $goalLabel · ${(pct * 100).round()}%',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,

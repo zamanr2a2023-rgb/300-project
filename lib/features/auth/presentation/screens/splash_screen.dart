@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/paned_logo.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../../router/routes.dart';
 import '../../../../features/onboarding/presentation/providers/onboarding_provider.dart';
 import '../providers/auth_session_provider.dart';
@@ -81,11 +80,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: MeshBackground(
-        child: Column(
-          children: [
-            const PanedStatusBar(),
-            Expanded(
-              child: Column(
+        child: SafeArea(
+          bottom: true,
+          child: Column(
                 children: [
                   const Spacer(flex: 2),
                   TweenAnimationBuilder<double>(
@@ -166,9 +163,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                   const SizedBox(height: 36),
                 ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

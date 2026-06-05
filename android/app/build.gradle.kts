@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,6 +7,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
 }
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.reader().use { keystoreProperties.load(it) }
+}
+
+val releaseKeystore = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
+val hasReleaseKeystore = releaseKeystore?.exists() == true
 
 android {
     namespace = "com.paned.app.paned_app"
@@ -31,13 +42,31 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = releaseKeystore
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
         }
     }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
+
+if (!hasReleaseKeystore) {
+    throw GradleException(
+        "Release keystore not found. Create it with:\n" +
+            "  keytool -genkey -v -keystore android/app/paned-release-key.jks " +
+            "-keyalg RSA -keysize 2048 -validity 10000 -alias paned\n" +
+            "Then set passwords in android/key.properties"
+    )
 }
 
 flutter {

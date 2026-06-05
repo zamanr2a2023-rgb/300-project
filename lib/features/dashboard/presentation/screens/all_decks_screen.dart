@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
 import '../providers/dashboard_tab_provider.dart';
@@ -27,12 +26,10 @@ class AllDecksScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        top: false,
         bottom: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const PanedStatusBar(),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.lg,

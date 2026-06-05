@@ -7,7 +7,6 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/paned_logo.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../../router/routes.dart';
 import '../view_models/auth_view_model.dart';
 import '../widgets/auth_form_widgets.dart';
@@ -61,12 +60,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: MeshBackground(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const PanedStatusBar(),
-            Expanded(
-              child: SingleChildScrollView(
+        child: SafeArea(
+          bottom: true,
+          child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.lg,
                   8,
@@ -155,9 +151,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

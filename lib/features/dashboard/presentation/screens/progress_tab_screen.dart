@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/paned_status_bar.dart';
 import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
@@ -55,11 +54,9 @@ class ProgressTabScreen extends ConsumerWidget {
         return Scaffold(
           backgroundColor: AppColors.background,
           body: SafeArea(
-            top: false,
             bottom: true,
             child: CustomScrollView(
               slivers: [
-                const SliverToBoxAdapter(child: PanedStatusBar()),
                 // Header
                 SliverToBoxAdapter(
                   child: Padding(
