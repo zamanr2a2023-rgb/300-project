@@ -78,10 +78,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
       body: MeshBackground(
         child: SafeArea(
-          bottom: true,
           child: Column(
                 children: [
                   const Spacer(flex: 2),

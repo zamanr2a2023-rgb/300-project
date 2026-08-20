@@ -28,7 +28,7 @@ class MeshBackground extends StatelessWidget {
           stops: [0.0, 0.48, 1.0],
         ),
       ),
-      child: child,
+      child: SizedBox.expand(child: child),
     );
   }
 }

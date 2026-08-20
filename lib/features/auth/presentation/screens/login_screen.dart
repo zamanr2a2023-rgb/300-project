@@ -58,18 +58,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
       body: MeshBackground(
         child: SafeArea(
-          bottom: true,
           child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  8,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                ),
-                child: Form(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.lg,
+            ),
+            child: Form(
                   key: _formKey,
                   child: AutofillGroup(
                     child: Column(
