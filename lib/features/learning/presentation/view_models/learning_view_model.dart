@@ -37,16 +37,24 @@ class LearningUiState {
 class LearningViewModel extends AsyncNotifier<LearningUiState> {
   @override
   Future<LearningUiState> build() async {
-    final sessionAsync = ref.watch(authSessionProvider);
-    final uid = sessionAsync.valueOrNull?.id;
+    final session = await ref.watch(authSessionProvider.future);
+    final uid = session?.id;
     if (uid == null) {
       return LearningUiState.empty;
     }
+    return _loadForUser(uid);
+  }
 
+  Future<LearningUiState> _loadForUser(String uid) async {
     final repo = ref.read(learningRepositoryProvider);
-    final progress = await repo.fetchProgress(uid);
-    final week = await repo.fetchWeekActivity(uid);
-    return LearningUiState(progress: progress, weekActivity: week);
+    try {
+      final progress = await repo.fetchProgress(uid);
+      final week = await repo.fetchWeekActivity(uid);
+      return LearningUiState(progress: progress, weekActivity: week);
+    } catch (_) {
+      // Prefer usable UI over an endless spinner when offline / timed out.
+      return LearningUiState.empty;
+    }
   }
 
   Future<void> refresh() async {

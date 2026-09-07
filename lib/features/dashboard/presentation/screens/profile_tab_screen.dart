@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/reminders/daily_reminder_provider.dart';
+import '../../../../core/reminders/daily_reminder_settings.dart';
+import '../../../../core/reminders/daily_reminder_sheet.dart';
+import '../../../../core/services/invite_share_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../auth/presentation/providers/auth_repository_provider.dart';
@@ -10,6 +14,7 @@ import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
+import '../../../settings/presentation/screens/settings_screen.dart';
 
 class ProfileTabScreen extends ConsumerWidget {
   const ProfileTabScreen({super.key});
@@ -19,6 +24,7 @@ class ProfileTabScreen extends ConsumerWidget {
     final learningAsync = ref.watch(learningViewModelProvider);
     final catalogAsync = ref.watch(wordsCatalogProvider);
     final profileAsync = ref.watch(userProfileProvider);
+    final reminderAsync = ref.watch(dailyReminderSettingsProvider);
     final session = ref.watch(authSessionProvider).valueOrNull;
 
     final profile = profileAsync.valueOrNull;
@@ -36,13 +42,16 @@ class ProfileTabScreen extends ConsumerWidget {
     final streak = learningAsync.valueOrNull?.streak ?? 0;
     final level = (summary.learned ~/ 10 + 1).clamp(1, 999);
 
+    final reminder = reminderAsync.valueOrNull ?? DailyReminderSettings.defaults;
+    final reminderValue =
+        reminder.enabled ? '${reminder.formattedTime} UK' : 'Off';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: true,
         child: CustomScrollView(
           slivers: [
-            // Header
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(
@@ -58,25 +67,35 @@ class ProfileTabScreen extends ConsumerWidget {
                         color: AppColors.foreground,
                       ),
                     ),
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: AppColors.card,
-                        shape: BoxShape.circle,
-                        border: AppColors.ringLeaf,
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const SettingsScreen(),
+                            ),
+                          );
+                        },
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.card,
+                            shape: BoxShape.circle,
+                            border: AppColors.ringLeaf,
+                          ),
+                          child: Icon(Icons.settings_outlined,
+                              size: 18, color: AppColors.foreground),
+                        ),
                       ),
-                      child: Icon(Icons.settings_outlined,
-                          size: 18, color: AppColors.foreground),
                     ),
                   ],
                 ),
               ),
             ),
-
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
-
-            // Avatar
             SliverToBoxAdapter(
               child: Center(
                 child: Column(
@@ -173,10 +192,7 @@ class ProfileTabScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
-
-            // Mini stats
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -191,10 +207,7 @@ class ProfileTabScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
-
-            // Settings list
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -209,11 +222,18 @@ class ProfileTabScreen extends ConsumerWidget {
                       _SettingsRow(
                         icon: Icons.notifications_outlined,
                         label: 'Daily reminder',
-                        value: '08:30',
+                        value: reminderValue,
+                        onTap: () => showDailyReminderSheet(
+                          context: context,
+                          ref: ref,
+                        ),
                       ),
                       _SettingsRow(
                         icon: Icons.favorite_outline_rounded,
                         label: 'Invite a friend',
+                        onTap: () {
+                          ref.read(inviteShareServiceProvider).shareInvite();
+                        },
                       ),
                       _SettingsRow(
                         icon: Icons.logout_rounded,
@@ -230,10 +250,7 @@ class ProfileTabScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
-
-            // Support card
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -301,7 +318,6 @@ class ProfileTabScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         ),
@@ -309,8 +325,6 @@ class ProfileTabScreen extends ConsumerWidget {
     );
   }
 }
-
-// ──────────────────────────────────────────────────────────────────
 
 class _MiniStat extends StatelessWidget {
   const _MiniStat({required this.value, required this.label});
@@ -423,7 +437,8 @@ class _SettingsRow extends StatelessWidget {
                 ),
               ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.mutedFg),
+            Icon(Icons.chevron_right_rounded,
+                size: 18, color: AppColors.mutedFg),
           ],
         ),
       ),

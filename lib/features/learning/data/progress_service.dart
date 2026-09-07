@@ -18,7 +18,14 @@ class ProgressService {
       _userRef(uid).collection('progress');
 
   Future<ProgressMap> fetchProgress(String userId) async {
-    final snap = await _progressRef(userId).get();
+    final snap = await _progressRef(userId).get().timeout(
+      const Duration(seconds: 12),
+      onTimeout: () => throw FirebaseException(
+        plugin: 'cloud_firestore',
+        code: 'deadline-exceeded',
+        message: 'Timed out loading progress.',
+      ),
+    );
     final map = <String, WordProgressEntry>{};
     for (final doc in snap.docs) {
       final data = doc.data();
@@ -31,7 +38,14 @@ class ProgressService {
   }
 
   Future<List<int>> fetchWeekActivity(String userId) async {
-    final snap = await _userRef(userId).get();
+    final snap = await _userRef(userId).get().timeout(
+      const Duration(seconds: 12),
+      onTimeout: () => throw FirebaseException(
+        plugin: 'cloud_firestore',
+        code: 'deadline-exceeded',
+        message: 'Timed out loading week activity.',
+      ),
+    );
     final raw = snap.data()?['weekActivity'];
     if (raw is List) {
       return raw.map((e) => (e as num).toInt()).toList();

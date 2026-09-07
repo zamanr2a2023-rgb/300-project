@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 import '../config/revenuecat_config.dart';
 
@@ -92,6 +93,25 @@ class RevenueCatService {
       if (kDebugMode) {
         debugPrint('RevenueCat logOutUser failed: $e');
       }
+    }
+  }
+
+  /// Opens RevenueCat Customer Center for subscription management.
+  /// Returns `false` when unavailable (not configured / platform / error).
+  Future<bool> presentCustomerCenter() async {
+    await initialize();
+    if (!_configured || !RevenueCatConfig.isSupportedPlatform) {
+      return false;
+    }
+
+    try {
+      await RevenueCatUI.presentCustomerCenter();
+      return true;
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('RevenueCat Customer Center failed: $e\n$st');
+      }
+      return false;
     }
   }
 }

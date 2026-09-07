@@ -19,10 +19,12 @@ val hasReleaseKeystore = releaseKeystore?.exists() == true
 
 android {
     namespace = "com.paned.app.paned_app"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler_android requires compileSdk 37+
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -40,6 +42,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -71,4 +74,8 @@ if (!hasReleaseKeystore) {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

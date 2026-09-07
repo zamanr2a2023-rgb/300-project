@@ -32,4 +32,19 @@ class UserProfile {
       'dailyGoal': dailyGoal,
     };
   }
+
+  UserProfile copyWith({
+    String? displayName,
+    String? avatarEmoji,
+    String? dialect,
+    int? dailyGoal,
+  }) {
+    return UserProfile(
+      id: id,
+      displayName: displayName ?? this.displayName,
+      avatarEmoji: avatarEmoji ?? this.avatarEmoji,
+      dialect: dialect ?? this.dialect,
+      dailyGoal: dailyGoal ?? this.dailyGoal,
+    );
+  }
 }
