@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
-import '../../../../core/services/welsh_tts_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../../../content/data/decks_data.dart';
@@ -51,7 +50,6 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
       };
 
   Future<void> _handleAction(_SwipeAction action, Word word) async {
-    await ref.read(vocabularyTtsServiceProvider).stop();
     if (mounted) {
       setState(() => _isSubmittingReview = true);
     }
@@ -81,14 +79,6 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
     }
   }
 
-  Future<void> _speakWord(Word word, {required bool flipped}) {
-    final tts = ref.read(vocabularyTtsServiceProvider);
-    if (flipped) {
-      return tts.speakWelsh(word.welsh);
-    }
-    return tts.speakEnglish(word.english);
-  }
-
   @override
   Widget build(BuildContext context) {
     final learningAsync = ref.watch(learningViewModelProvider);
@@ -98,7 +88,6 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
 
     ref.listen(selectedDeckIdProvider, (prev, next) {
       if (prev != next) {
-        ref.read(vocabularyTtsServiceProvider).stop();
         setState(() {
           _idx = 0;
           _flipped = false;
@@ -162,7 +151,6 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
       pct: pct,
       wordStatus: wordStatus,
       safeIdx: safeIdx,
-      onSpeak: () => _speakWord(current, flipped: _flipped),
     );
   }
 
@@ -175,7 +163,6 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
     required double pct,
     required WordStatus wordStatus,
     required int safeIdx,
-    required VoidCallback onSpeak,
   }) {
 
         // Determine live gesture hint
@@ -214,15 +201,28 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                   padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, 0),
                   child: Row(
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: AppColors.card,
-                          shape: BoxShape.circle,
-                          border: AppColors.ringLeaf,
+                      Material(
+                        color: AppColors.card,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          onTap: () {
+                            ref.read(panedDashboardTabIndexProvider.notifier).state = 0;
+                          },
+                          customBorder: const CircleBorder(),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: AppColors.ringLeaf,
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color: AppColors.foreground,
+                            ),
+                          ),
                         ),
-                        child: Icon(Icons.close_rounded, size: 18, color: AppColors.foreground),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -366,7 +366,6 @@ class _LearnTabScreenState extends ConsumerState<LearnTabScreen> {
                                 flipped: _flipped,
                                 status: wordStatus,
                                 hint: hint,
-                                onSpeak: onSpeak,
                                 isLoadingWord: _isSubmittingReview,
                               ),
                             ),
@@ -532,7 +531,6 @@ class _FlashCard extends StatelessWidget {
     required this.word,
     required this.flipped,
     required this.status,
-    required this.onSpeak,
     this.isLoadingWord = false,
     this.hint,
   });
@@ -540,7 +538,6 @@ class _FlashCard extends StatelessWidget {
   final Word word;
   final bool flipped;
   final WordStatus status;
-  final VoidCallback onSpeak;
   final bool isLoadingWord;
   final _SwipeAction? hint;
 
@@ -561,45 +558,26 @@ class _FlashCard extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                // Status + audio row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _statusColor(status).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        _statusLabel(status),
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: _statusColor(status),
-                          letterSpacing: 0.5,
-                        ),
+                // Status row
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _statusColor(status).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _statusLabel(status),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: _statusColor(status),
+                        letterSpacing: 0.5,
                       ),
                     ),
-                    Material(
-                      color: AppColors.secondary,
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        onTap: onSpeak,
-                        customBorder: const CircleBorder(),
-                        child: SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: Icon(
-                            Icons.volume_up_rounded,
-                            size: 16,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 // Card content
                 Expanded(

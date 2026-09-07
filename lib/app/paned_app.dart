@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/revenuecat/revenuecat_identity_sync_provider.dart';
 import '../core/theme/app_theme.dart';
 import '../router/app_router.dart';
 
@@ -10,6 +11,7 @@ class PanedApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(revenueCatIdentitySyncProvider);
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
