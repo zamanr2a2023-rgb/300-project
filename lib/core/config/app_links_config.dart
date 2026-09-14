@@ -7,8 +7,8 @@ abstract final class AppLinksConfig {
   static const String buyUsACuppaUrl = '';
 
   /// Privacy Policy page.
-  /// STATUS: missing — set the real privacy policy URL when available.
-  static const String privacyPolicyUrl = '';
+  static const String privacyPolicyUrl =
+      'https://zamanr2a2023-rgb.github.io/paned/privacy-policy.html';
 
   /// Terms & Conditions page.
   /// STATUS: missing — set the real terms URL when available.
@@ -16,5 +16,6 @@ abstract final class AppLinksConfig {
 
   static bool get hasBuyUsACuppaUrl => buyUsACuppaUrl.trim().isNotEmpty;
   static bool get hasPrivacyPolicyUrl => privacyPolicyUrl.trim().isNotEmpty;
-  static bool get hasTermsUrl => termsAndConditionsUrl.trim().isNotEmpty;
+  static bool get hasTermsAndConditionsUrl =>
+      termsAndConditionsUrl.trim().isNotEmpty;
 }

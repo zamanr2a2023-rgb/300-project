@@ -12,10 +12,9 @@ import '../../../../core/services/invite_share_service.dart';
 import '../../../../core/services/revenuecat_service.dart';
 import '../../../../core/services/url_launch_service.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../profile/data/profile_repository.dart';
-import '../../../profile/presentation/providers/profile_repository_provider.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
+import '../../../profile/presentation/widgets/daily_goal_sheet.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -101,7 +100,11 @@ class SettingsScreen extends ConsumerWidget {
                         title: 'Daily Goal',
                         subtitle: 'Learning target',
                         trailing: '$dailyGoal words',
-                        onTap: () => _openDailyGoalSheet(context, ref, dailyGoal),
+                        onTap: () => showDailyGoalSheet(
+                          context: context,
+                          ref: ref,
+                          currentGoal: dailyGoal,
+                        ),
                       ),
                     ],
                   ),
@@ -154,18 +157,6 @@ class SettingsScreen extends ConsumerWidget {
                         subtitle: 'Share Paned with friends',
                         onTap: () => _shareInvite(context, ref),
                       ),
-                      _SettingsTile(
-                        icon: Icons.local_cafe_outlined,
-                        title: 'Buy Us a Cuppa',
-                        subtitle: 'Support Welsh learning',
-                        onTap: () => _openConfiguredUrl(
-                          context,
-                          ref,
-                          url: AppLinksConfig.buyUsACuppaUrl,
-                          missingMessage:
-                              'Support link is not configured yet.',
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -187,7 +178,7 @@ class SettingsScreen extends ConsumerWidget {
                       _SettingsTile(
                         icon: Icons.description_outlined,
                         title: 'Terms & Conditions',
-                        subtitle: 'App terms of use',
+                        subtitle: 'Rules for using Paned',
                         onTap: () => _openConfiguredUrl(
                           context,
                           ref,
@@ -273,143 +264,6 @@ class SettingsScreen extends ConsumerWidget {
         const SnackBar(content: Text('Could not open the link.')),
       );
     }
-  }
-
-  Future<void> _openDailyGoalSheet(
-    BuildContext context,
-    WidgetRef ref,
-    int currentGoal,
-  ) async {
-    final options = <int>[10, 15, 20, 25, 30, 40, 50];
-    var selected = currentGoal;
-    if (!options.contains(selected)) {
-      selected = options.reduce(
-        (a, b) => (a - currentGoal).abs() <= (b - currentGoal).abs() ? a : b,
-      );
-    }
-
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: AppColors.card,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppColors.border,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Daily Goal',
-                      style: GoogleFonts.dmSerifDisplay(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.foreground,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'How many word reviews do you want each day?',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 13,
-                        color: AppColors.mutedFg,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: options.map((goal) {
-                        final active = selected == goal;
-                        return ChoiceChip(
-                          label: Text('$goal'),
-                          selected: active,
-                          onSelected: (_) => setState(() => selected = goal),
-                          selectedColor: AppColors.primary,
-                          labelStyle: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w700,
-                            color: active
-                                ? AppColors.onPrimary
-                                : AppColors.foreground,
-                          ),
-                          backgroundColor: AppColors.secondary,
-                          side: BorderSide(
-                            color: active
-                                ? AppColors.primary
-                                : AppColors.border,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 18),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: () async {
-                          final session =
-                              ref.read(authSessionProvider).valueOrNull;
-                          final uid = session?.id;
-                          if (uid == null) {
-                            Navigator.of(sheetContext).pop();
-                            return;
-                          }
-                          await ref
-                              .read(profileRepositoryProvider)
-                              .updateDailyGoal(uid, selected);
-                          if (context.mounted) {
-                            Navigator.of(sheetContext).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Daily goal set to $selected words.',
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          'Save goal',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 }
 

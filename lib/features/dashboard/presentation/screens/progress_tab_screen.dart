@@ -7,7 +7,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../content/presentation/providers/words_catalog_provider.dart';
 import '../../../learning/domain/learning_math.dart';
 import '../../../learning/presentation/view_models/learning_view_model.dart';
+import '../../../profile/data/profile_repository.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
+import '../../../profile/presentation/widgets/daily_goal_sheet.dart';
 
 class ProgressTabScreen extends ConsumerWidget {
   const ProgressTabScreen({super.key});
@@ -42,7 +44,7 @@ class ProgressTabScreen extends ConsumerWidget {
         );
         final streak = state.streak;
         final profile = profileAsync.valueOrNull;
-        final goal = profile?.dailyGoal ?? 20;
+        final goal = profile?.dailyGoal ?? ProfileRepository.defaultDailyGoal;
         final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
         final weekActivity = state.weekActivity;
         final max = weekActivity.reduce((a, b) => a > b ? a : b);
@@ -281,50 +283,64 @@ class ProgressTabScreen extends ConsumerWidget {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    child: Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary,
+                    child: Material(
+                      color: AppColors.secondary,
+                      borderRadius: BorderRadius.circular(20),
+                      child: InkWell(
+                        onTap: () => showDailyGoalSheet(
+                          context: context,
+                          ref: ref,
+                          currentGoal: goal,
+                        ),
                         borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.track_changes_rounded,
-                                color: Colors.white, size: 20),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Daily goal',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.foreground,
-                                  ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Text(
-                                  '$todayCount / $goal reviews today',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 11,
-                                    color: AppColors.mutedFg,
-                                  ),
+                                child: const Icon(
+                                  Icons.track_changes_rounded,
+                                  color: Colors.white,
+                                  size: 20,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Daily goal',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.foreground,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$todayCount / $goal reviews today',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 11,
+                                        color: AppColors.mutedFg,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.edit_outlined,
+                                size: 16,
+                                color: AppColors.mutedFg,
+                              ),
+                            ],
                           ),
-                          const Icon(Icons.calendar_today_rounded,
-                              size: 16, color: AppColors.mutedFg),
-                        ],
+                        ),
                       ),
                     ),
                   ),

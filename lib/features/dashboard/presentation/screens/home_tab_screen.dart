@@ -137,33 +137,44 @@ class HomeTabScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    // Streak badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.1),
+                    // Streak badge → Stats tab
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          ref
+                              .read(panedDashboardTabIndexProvider.notifier)
+                              .state = 2;
+                        },
                         borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.local_fire_department_rounded,
-                            size: 14,
-                            color: AppColors.accent,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
                           ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '$streak',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.accent,
-                            ),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                        ],
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.local_fire_department_rounded,
+                                size: 14,
+                                color: AppColors.accent,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                '$streak',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.accent,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),

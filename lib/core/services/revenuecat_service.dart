@@ -5,7 +5,29 @@ import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 import '../config/revenuecat_config.dart';
 
-/// RevenueCat SDK wrapper for initialization and user identity sync.
+/// Thrown when RevenueCat is unavailable (unsupported platform / failed configure).
+class RevenueCatUnavailableException implements Exception {
+  RevenueCatUnavailableException([
+    this.message = 'RevenueCat is not available on this device.',
+  ]);
+
+  final String message;
+
+  @override
+  String toString() => 'RevenueCatUnavailableException: $message';
+}
+
+/// Thrown when the expected offering/package is missing from the dashboard catalog.
+class RevenueCatCatalogException implements Exception {
+  RevenueCatCatalogException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'RevenueCatCatalogException: $message';
+}
+
+/// RevenueCat SDK wrapper: identity, offerings, purchase, restore, entitlements.
 class RevenueCatService {
   Future<void>? _initializeFuture;
   String? _linkedUserId;
@@ -44,6 +66,13 @@ class RevenueCatService {
       if (kDebugMode) {
         debugPrint('RevenueCat initialization failed: $e');
       }
+    }
+  }
+
+  Future<void> _ensureConfigured() async {
+    await initialize();
+    if (!_configured || !RevenueCatConfig.isSupportedPlatform) {
+      throw RevenueCatUnavailableException();
     }
   }
 
@@ -114,9 +143,84 @@ class RevenueCatService {
       return false;
     }
   }
+
+  /// Loads all offerings from RevenueCat.
+  Future<Offerings> getOfferings() async {
+    await _ensureConfigured();
+    return Purchases.getOfferings();
+  }
+
+  /// Resolves the `default` offering, falling back to the dashboard current offering.
+  Future<Offering> getDefaultOffering() async {
+    final offerings = await getOfferings();
+    final offering = offerings.getOffering(RevenueCatConfig.offeringId) ??
+        offerings.current;
+    if (offering == null) {
+      throw RevenueCatCatalogException(
+        'Offering "${RevenueCatConfig.offeringId}" was not found, '
+        'and no current offering is configured.',
+      );
+    }
+    return offering;
+  }
+
+  /// Resolves the monthly package (`$rc_monthly` / monthly product).
+  Future<Package> getMonthlyPackage() async {
+    final offering = await getDefaultOffering();
+
+    final byPackageId = offering.getPackage(RevenueCatConfig.monthlyPackageId);
+    if (byPackageId != null) return byPackageId;
+
+    final monthly = offering.monthly;
+    if (monthly != null) return monthly;
+
+    for (final package in offering.availablePackages) {
+      if (package.storeProduct.identifier == RevenueCatConfig.monthlyProductId) {
+        return package;
+      }
+    }
+
+    throw RevenueCatCatalogException(
+      'Monthly package "${RevenueCatConfig.monthlyPackageId}" '
+      '(product "${RevenueCatConfig.monthlyProductId}") was not found '
+      'in offering "${offering.identifier}".',
+    );
+  }
+
+  /// Latest [CustomerInfo] for the current App User ID.
+  Future<CustomerInfo> getCustomerInfo() async {
+    await _ensureConfigured();
+    return Purchases.getCustomerInfo();
+  }
+
+  /// Whether [info] currently unlocks [RevenueCatConfig.entitlementId].
+  bool hasProEntitlement(CustomerInfo info) {
+    return info.entitlements.active.containsKey(RevenueCatConfig.entitlementId);
+  }
+
+  /// Convenience: fetch CustomerInfo and check `paned_ap_pro`.
+  Future<bool> isProActive() async {
+    final info = await getCustomerInfo();
+    return hasProEntitlement(info);
+  }
+
+  /// Purchases the monthly package from the default offering.
+  ///
+  /// Store cancellation surfaces as a [PurchasesError] — treat cancel as non-fatal.
+  Future<CustomerInfo> purchaseMonthly() async {
+    final package = await getMonthlyPackage();
+    final result = await Purchases.purchase(PurchaseParams.package(package));
+    return result.customerInfo;
+  }
+
+  /// Restores previous purchases for the current App User ID.
+  Future<CustomerInfo> restorePurchases() async {
+    await _ensureConfigured();
+    return Purchases.restorePurchases();
+  }
 }
 
-/// Shared service instance initialized during app startup.
+/// Shared service instance initialized during application startup.
 final revenueCatService = RevenueCatService();
 
 final revenueCatServiceProvider = Provider<RevenueCatService>((ref) {
