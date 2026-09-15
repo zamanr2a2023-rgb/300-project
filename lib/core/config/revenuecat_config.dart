@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// RevenueCat Public SDK keys and catalog identifiers.
 ///
-/// Replace [androidApiKey] / [iosApiKey] with store keys (`goog_` / `appl_`)
-/// once Google Play / App Store apps are connected in the RevenueCat dashboard.
+/// Store keys: replace `test_...` with real `goog_...` / `appl_...` when Play/App
+/// Store apps are connected in the RevenueCat dashboard.
 abstract final class RevenueCatConfig {
-  /// Test Store key until Play/App Store SDK keys are available.
   static const String androidApiKey = 'test_nVYBPMhxbCQplYeyVHugjqLJMWe';
   static const String iosApiKey = 'test_nVYBPMhxbCQplYeyVHugjqLJMWe';
 
-  /// Dashboard entitlement that unlocks Paned Pro.
+  /// Dashboard entitlement that unlocks paid access.
   static const String entitlementId = 'paned_ap_pro';
 
   /// Dashboard offering identifier.
@@ -18,7 +18,7 @@ abstract final class RevenueCatConfig {
   /// Dashboard package identifier for the monthly plan.
   static const String monthlyPackageId = r'$rc_monthly';
 
-  /// Store product identifier for the monthly subscription.
+  /// Store product identifier (Play / App Store).
   static const String monthlyProductId = 'monthly';
 
   static bool get isSupportedPlatform {
@@ -35,5 +35,11 @@ abstract final class RevenueCatConfig {
       TargetPlatform.android => androidApiKey,
       _ => androidApiKey,
     };
+  }
+
+  /// Whether [info] currently has the Paned Pro entitlement.
+  static bool hasProEntitlement(CustomerInfo? info) {
+    if (info == null) return false;
+    return info.entitlements.active.containsKey(entitlementId);
   }
 }

@@ -1,30 +1,31 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 import '../config/revenuecat_config.dart';
 
-/// Thrown when RevenueCat is unavailable (unsupported platform / failed configure).
-class RevenueCatUnavailableException implements Exception {
-  RevenueCatUnavailableException([
-    this.message = 'RevenueCat is not available on this device.',
-  ]);
-
-  final String message;
-
-  @override
-  String toString() => 'RevenueCatUnavailableException: $message';
+/// Result of a purchase attempt (includes user-cancel as a non-error outcome).
+enum SubscriptionPurchaseStatus {
+  success,
+  cancelled,
+  unavailable,
+  failed,
 }
 
-/// Thrown when the expected offering/package is missing from the dashboard catalog.
-class RevenueCatCatalogException implements Exception {
-  RevenueCatCatalogException(this.message);
+class SubscriptionPurchaseOutcome {
+  const SubscriptionPurchaseOutcome({
+    required this.status,
+    this.customerInfo,
+    this.message,
+  });
 
-  final String message;
+  final SubscriptionPurchaseStatus status;
+  final CustomerInfo? customerInfo;
+  final String? message;
 
-  @override
-  String toString() => 'RevenueCatCatalogException: $message';
+  bool get isSuccess => status == SubscriptionPurchaseStatus.success;
 }
 
 /// RevenueCat SDK wrapper: identity, offerings, purchase, restore, entitlements.
@@ -66,13 +67,6 @@ class RevenueCatService {
       if (kDebugMode) {
         debugPrint('RevenueCat initialization failed: $e');
       }
-    }
-  }
-
-  Future<void> _ensureConfigured() async {
-    await initialize();
-    if (!_configured || !RevenueCatConfig.isSupportedPlatform) {
-      throw RevenueCatUnavailableException();
     }
   }
 
@@ -125,6 +119,138 @@ class RevenueCatService {
     }
   }
 
+  /// Latest [CustomerInfo], or `null` when SDK is unavailable.
+  Future<CustomerInfo?> getCustomerInfo() async {
+    await initialize();
+    if (!_configured) return null;
+
+    try {
+      return await Purchases.getCustomerInfo();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('RevenueCat getCustomerInfo failed: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Whether the current user has [RevenueCatConfig.entitlementId] active.
+  Future<bool> hasProEntitlement() async {
+    final info = await getCustomerInfo();
+    return RevenueCatConfig.hasProEntitlement(info);
+  }
+
+  /// Loads all offerings from RevenueCat.
+  Future<Offerings?> getOfferings() async {
+    await initialize();
+    if (!_configured) return null;
+
+    try {
+      return await Purchases.getOfferings();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('RevenueCat getOfferings failed: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Resolves the configured `default` offering (falls back to current).
+  Future<Offering?> getDefaultOffering() async {
+    final offerings = await getOfferings();
+    if (offerings == null) return null;
+
+    return offerings.getOffering(RevenueCatConfig.offeringId) ??
+        offerings.current;
+  }
+
+  /// Resolves the monthly package (`$rc_monthly`) from the default offering.
+  Future<Package?> getMonthlyPackage() async {
+    final offering = await getDefaultOffering();
+    if (offering == null) return null;
+
+    final byId = offering.getPackage(RevenueCatConfig.monthlyPackageId);
+    if (byId != null) return byId;
+
+    if (offering.monthly != null) return offering.monthly;
+
+    for (final package in offering.availablePackages) {
+      if (package.storeProduct.identifier ==
+              RevenueCatConfig.monthlyProductId ||
+          package.identifier == RevenueCatConfig.monthlyPackageId) {
+        return package;
+      }
+    }
+    return null;
+  }
+
+  /// Purchases the monthly package. User cancel is a normal [cancelled] outcome.
+  Future<SubscriptionPurchaseOutcome> purchaseMonthlyPackage() async {
+    await initialize();
+    if (!_configured || !RevenueCatConfig.isSupportedPlatform) {
+      return const SubscriptionPurchaseOutcome(
+        status: SubscriptionPurchaseStatus.unavailable,
+        message: 'Subscriptions are unavailable on this device.',
+      );
+    }
+
+    final package = await getMonthlyPackage();
+    if (package == null) {
+      return const SubscriptionPurchaseOutcome(
+        status: SubscriptionPurchaseStatus.unavailable,
+        message:
+            'Monthly plan is not available yet. Check RevenueCat offerings.',
+      );
+    }
+
+    try {
+      final result = await Purchases.purchase(
+        PurchaseParams.package(package),
+      );
+      return SubscriptionPurchaseOutcome(
+        status: SubscriptionPurchaseStatus.success,
+        customerInfo: result.customerInfo,
+      );
+    } on PlatformException catch (e) {
+      final code = PurchasesErrorHelper.getErrorCode(e);
+      if (code == PurchasesErrorCode.purchaseCancelledError) {
+        return const SubscriptionPurchaseOutcome(
+          status: SubscriptionPurchaseStatus.cancelled,
+        );
+      }
+      if (kDebugMode) {
+        debugPrint('RevenueCat purchaseMonthlyPackage failed: $e');
+      }
+      return SubscriptionPurchaseOutcome(
+        status: SubscriptionPurchaseStatus.failed,
+        message: e.message ?? 'Purchase failed.',
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('RevenueCat purchaseMonthlyPackage failed: $e');
+      }
+      return SubscriptionPurchaseOutcome(
+        status: SubscriptionPurchaseStatus.failed,
+        message: e.toString(),
+      );
+    }
+  }
+
+  /// Restores previous purchases and returns updated [CustomerInfo].
+  Future<CustomerInfo?> restorePurchases() async {
+    await initialize();
+    if (!_configured) return null;
+
+    try {
+      return await Purchases.restorePurchases();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('RevenueCat restorePurchases failed: $e');
+      }
+      rethrow;
+    }
+  }
+
   /// Opens RevenueCat Customer Center for subscription management.
   /// Returns `false` when unavailable (not configured / platform / error).
   Future<bool> presentCustomerCenter() async {
@@ -143,84 +269,9 @@ class RevenueCatService {
       return false;
     }
   }
-
-  /// Loads all offerings from RevenueCat.
-  Future<Offerings> getOfferings() async {
-    await _ensureConfigured();
-    return Purchases.getOfferings();
-  }
-
-  /// Resolves the `default` offering, falling back to the dashboard current offering.
-  Future<Offering> getDefaultOffering() async {
-    final offerings = await getOfferings();
-    final offering = offerings.getOffering(RevenueCatConfig.offeringId) ??
-        offerings.current;
-    if (offering == null) {
-      throw RevenueCatCatalogException(
-        'Offering "${RevenueCatConfig.offeringId}" was not found, '
-        'and no current offering is configured.',
-      );
-    }
-    return offering;
-  }
-
-  /// Resolves the monthly package (`$rc_monthly` / monthly product).
-  Future<Package> getMonthlyPackage() async {
-    final offering = await getDefaultOffering();
-
-    final byPackageId = offering.getPackage(RevenueCatConfig.monthlyPackageId);
-    if (byPackageId != null) return byPackageId;
-
-    final monthly = offering.monthly;
-    if (monthly != null) return monthly;
-
-    for (final package in offering.availablePackages) {
-      if (package.storeProduct.identifier == RevenueCatConfig.monthlyProductId) {
-        return package;
-      }
-    }
-
-    throw RevenueCatCatalogException(
-      'Monthly package "${RevenueCatConfig.monthlyPackageId}" '
-      '(product "${RevenueCatConfig.monthlyProductId}") was not found '
-      'in offering "${offering.identifier}".',
-    );
-  }
-
-  /// Latest [CustomerInfo] for the current App User ID.
-  Future<CustomerInfo> getCustomerInfo() async {
-    await _ensureConfigured();
-    return Purchases.getCustomerInfo();
-  }
-
-  /// Whether [info] currently unlocks [RevenueCatConfig.entitlementId].
-  bool hasProEntitlement(CustomerInfo info) {
-    return info.entitlements.active.containsKey(RevenueCatConfig.entitlementId);
-  }
-
-  /// Convenience: fetch CustomerInfo and check `paned_ap_pro`.
-  Future<bool> isProActive() async {
-    final info = await getCustomerInfo();
-    return hasProEntitlement(info);
-  }
-
-  /// Purchases the monthly package from the default offering.
-  ///
-  /// Store cancellation surfaces as a [PurchasesError] — treat cancel as non-fatal.
-  Future<CustomerInfo> purchaseMonthly() async {
-    final package = await getMonthlyPackage();
-    final result = await Purchases.purchase(PurchaseParams.package(package));
-    return result.customerInfo;
-  }
-
-  /// Restores previous purchases for the current App User ID.
-  Future<CustomerInfo> restorePurchases() async {
-    await _ensureConfigured();
-    return Purchases.restorePurchases();
-  }
 }
 
-/// Shared service instance initialized during application startup.
+/// Shared service instance initialized during app startup.
 final revenueCatService = RevenueCatService();
 
 final revenueCatServiceProvider = Provider<RevenueCatService>((ref) {
